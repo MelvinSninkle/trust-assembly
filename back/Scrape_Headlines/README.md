@@ -24,5 +24,5 @@ Next: Fox news to get some balance
  TODO: it's console now, but we can pretty easily make this a service that runs on a schedule
 
 
-
+ TODO:  make it so that it will be straightforward to add more sites with just a few settings and overrides for each one
 

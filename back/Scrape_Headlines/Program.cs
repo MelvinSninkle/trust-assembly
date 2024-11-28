@@ -10,6 +10,7 @@ namespace Scrape_Headlines
             Log.Info("Started");
 
             ///var site = new New_York_Times();
+            //TODO: wrl and all shoudl just use playwright
             var site = new World_Religion_News();
 
             var heads = site.Scrape_Headlines();
