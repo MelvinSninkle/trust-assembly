@@ -20,7 +20,14 @@ namespace Scrape_Headlines.Sites
             // need to make the site think we are a browser
             //TODO: Intermittently get 403 Forbidden, but it's not clear why
 
-            var (is_ok, html) = Utes.HttpGetHtmlFromUrl(site_url);
+            //            var (is_ok, html) = Utes.HttpGetHtmlFromUrl(site_url);
+
+            var (is_ok, html) = ReadHtmlOrCache(site_url);
+
+            if (!is_ok)
+            {
+                return items;
+            }
 
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
@@ -61,7 +68,7 @@ namespace Scrape_Headlines.Sites
         {
             var art = new Headline();
 
-            var (is_ok, html) = Utes.HttpGetHtmlFromUrl(url);
+            var (is_ok, html) = ReadHtmlOrCache(url);
             if (!is_ok)
             {
                 return null;

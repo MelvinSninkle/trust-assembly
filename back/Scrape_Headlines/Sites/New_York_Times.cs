@@ -1,5 +1,4 @@
-﻿using Microsoft.Playwright;
-using Scrape_Headlines.Site_Classes;
+﻿using Scrape_Headlines.Site_Classes;
 using Scrape_Headlines.Utilities;
 
 namespace Scrape_Headlines.Sites
@@ -9,33 +8,18 @@ namespace Scrape_Headlines.Sites
         public New_York_Times()
             : base()
         {
-            {
-                site_url = @"https://www.nytimes.com/";
-            }
+            site_url = @"https://www.nytimes.com/";
         }
 
         public override List<Headline> Scrape_Headlines()
         {
-            // hmm, NYT could use an API, but that is not generic]
-            // plain httpclient does not seem to work
-            // try playwright...
-            //    pwsh bin/Debug/netX/playwright.ps1 install
-
-
-            // Joe knows all: https://forum.linqpad.net/discussion/2710/using-playwright-in-linqpad
-            Microsoft.Playwright.Program.Main(new[] { "install" }); // Install Playwright if not already installed
-
-            var playwright = Playwright.CreateAsync().Result;
-            browser = playwright.Chromium.LaunchAsync().Result;
-
-            var page = Get_CurrentPage(browser);
-
-            var task = page.GotoAsync(site_url);
-            var x = task.Result;
-
-            var html = page.ContentAsync().Result;
-
             var items = new List<Headline>();
+            var (is_ok, html) = ReadHtmlOrCache(site_url);
+
+            if (!is_ok)
+            {
+                return items;
+            }
 
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
@@ -112,34 +96,6 @@ namespace Scrape_Headlines.Sites
             art.last_read = DateTime.Now;
 
             return art;
-        }
-
-        private (bool is_ok, string html) ReadHtmlOrCache(string url)
-        {
-            var html = "";
-            var is_ok = true;
-            var cache_file = Path.Combine(@"C:\temp", $"{Utes.MakeValidFilename(url)}.html");
-            if (File.Exists(cache_file))
-            {
-                var fi = new FileInfo(cache_file);
-                if (fi.LastWriteTime > DateTime.Now.AddMinutes(-10))
-                {
-                    html = File.ReadAllText(cache_file);
-                    return (true, html);
-                }
-            }
-            var page = Get_CurrentPage(browser);
-            var task = page.GotoAsync(site_url);
-            var x = task.Result;
-
-            html = page.ContentAsync().Result;
-
-            if (is_ok)
-            {
-                File.WriteAllText(cache_file, html);
-            }
-
-            return (is_ok, html);
         }
     }
 }

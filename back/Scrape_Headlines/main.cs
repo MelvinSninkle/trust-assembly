@@ -1,4 +1,5 @@
 ﻿using Scrape_Headlines.Sites;
+using Scrape_Headlines.Site_Classes;
 using Scrape_Headlines.Utilities;
 
 namespace Scrape_Headlines
@@ -15,9 +16,18 @@ namespace Scrape_Headlines
 
             ///var site = new New_York_Times();
             //TODO: wrl and all shoudl just use playwright
-            var site = new World_Religion_News();
 
-            var heads = site.Scrape_Headlines();
+            var sites = new List<Site_Scrape>();
+            sites.Add(new New_York_Times());
+            sites.Add(new World_Religion_News());
+
+            var heads = new List<Headline>();
+
+            foreach (var site in sites)
+            {
+                var tmp = site.Scrape_Headlines();
+                heads.AddRange(tmp);
+            }
 
             Log.Info(heads.ToJsonPretty());
 
