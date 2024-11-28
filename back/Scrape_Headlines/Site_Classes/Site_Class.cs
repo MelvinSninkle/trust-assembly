@@ -80,7 +80,7 @@ namespace Scrape_Headlines
             if (File.Exists(cache_file))
             {
                 var fi = new FileInfo(cache_file);
-                if (fi.LastWriteTime > DateTime.Now.AddMinutes(-10))
+                if (fi.LastWriteTime > DateTime.Now.AddMinutes(-30))
                 {
                     html = File.ReadAllText(cache_file);
                     return (true, html);

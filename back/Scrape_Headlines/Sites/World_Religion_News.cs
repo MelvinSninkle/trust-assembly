@@ -8,9 +8,7 @@ namespace Scrape_Headlines.Sites
         public World_Religion_News()
             : base()
         {
-            {
-                site_url = @"https://www.worldreligionnews.com/";
-            }
+            site_url = @"https://www.worldreligionnews.com/";
         }
 
         public override List<Headline> Scrape_Headlines()
@@ -42,6 +40,13 @@ namespace Scrape_Headlines.Sites
 
             //"//div[@class='post-thumb']"
             var divs = doc_node.SelectNodes("//div[@class='post-thumb']");
+
+            if (divs == null)
+            {
+                Log.Warn($"Issue reading url: {site_url}\n{html}");
+                return items;
+            }
+
             Log.Info(divs.Count());
             foreach (var div in divs)
             {
@@ -59,16 +64,34 @@ namespace Scrape_Headlines.Sites
 
                 // really need to jump in and get the article
                 var item = Read_Article(href);
-                items.Add(item);
+                if (item != null)
+                {
+                    items.Add(item);
+                }
             }
             return items;
         }
 
         public Headline Read_Article(string url)
         {
-            var art = new Headline();
+            var art = new Headline { site = site_url, url = url };
 
             var (is_ok, html) = ReadHtmlOrCache(url);
+            if (!is_ok)
+            {
+                return null;
+            }
+            var times = 0;
+            while (
+                times++ < 10 && html.Contains("Attention Required! | Cloudflare")
+                || html.Contains("DDoS protection by Cloudflare")
+                || html.Contains("Please turn JavaScript on and reload the page.")
+            )
+            {
+                Thread.Sleep(1000 * times);
+                (is_ok, html) = ReadHtmlOrCache(url);
+                Log.Warn($"{times} Cloudflare issue: {url}");
+            }
             if (!is_ok)
             {
                 return null;
@@ -83,6 +106,11 @@ namespace Scrape_Headlines.Sites
             {
                 art.headline_text = title_node.InnerText;
             }
+            else
+            {
+                return null;
+            }
+
             //$x("//div[@class='date']/ul/li")
             var bylines = node.SelectNodes("//div[@class='date']/ul/li");
             if (bylines?.Count > 0)

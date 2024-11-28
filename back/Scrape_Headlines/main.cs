@@ -18,7 +18,7 @@ namespace Scrape_Headlines
             //TODO: wrl and all shoudl just use playwright
 
             var sites = new List<Site_Scrape>();
-            sites.Add(new New_York_Times());
+            //`            sites.Add(new New_York_Times());
             sites.Add(new World_Religion_News());
 
             var heads = new List<Headline>();

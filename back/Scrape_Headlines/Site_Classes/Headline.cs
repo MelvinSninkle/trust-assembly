@@ -2,6 +2,7 @@
 {
     public class Headline
     {
+        public string site { get; set; }
         public string url { get; set; }
         public string headline_text { get; set; }
         public DateTime date { get; set; }

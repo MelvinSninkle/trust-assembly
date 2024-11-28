@@ -31,6 +31,12 @@ namespace Scrape_Headlines.Sites
             // $x("//section[@class='story-wrapper']")
 
             var divs = doc_node.SelectNodes("//section[@class='story-wrapper']");
+            if (divs == null)
+            {
+                Log.Warn($"Issue reading url: {site_url}\n{html}");
+                return items;
+            }
+
             Log.Info($"{divs.Count} healines");
             foreach (var (div, index) in divs.WithIndex())
             {
@@ -48,14 +54,17 @@ namespace Scrape_Headlines.Sites
 
                 // really need to jump in and get the article
                 var item = Read_Article(href);
-                items.Add(item);
+                if (item != null)
+                {
+                    items.Add(item);
+                }
             }
             return items;
         }
 
         public Headline Read_Article(string url)
         {
-            var art = new Headline();
+            var art = new Headline { site = site_url, url = url };
 
             var (is_ok, html) = ReadHtmlOrCache(url);
 
@@ -67,6 +76,10 @@ namespace Scrape_Headlines.Sites
             if (title_node != null)
             {
                 art.headline_text = title_node.InnerText;
+            }
+            else
+            {
+                return null;
             }
             //  $x("//span[@class='byline-prefix']/following-sibling::a")
             var bylines = node.SelectNodes("//div[@class='date']/ul/li");
